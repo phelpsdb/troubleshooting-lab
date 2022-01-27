@@ -1,0 +1,9 @@
+{
+	"host": "",
+	"port": 8080,
+	"backlog_queue_size": 2048,
+	"max_keepalive_connections": 2048,
+	"chunk_size": 1024,
+	"failure_backoff_sec": 2,
+	"rebind_on_config_reload": false
+}

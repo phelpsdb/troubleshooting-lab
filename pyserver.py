@@ -2,7 +2,6 @@
 # Simple python server for troubleshooting exercise
 # Instructions in README.md
 
-from queue import Queue
 import logging
 import re
 import signal
@@ -10,8 +9,10 @@ import socket
 import time
 import datetime
 from common import load_config
+from logging.handlers import SysLogHandler
+from queue import Queue
 
-logging.basicConfig(level=logging.INFO, filename="server.log", filemode="w")
+logging.basicConfig(level=logging.INFO, handlers=[SysLogHandler("/dev/log")])
 
 config = {}
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

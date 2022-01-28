@@ -3,33 +3,26 @@
 # Instructions in README.md
 
 from queue import Queue
-import json
 import logging
 import re
 import signal
 import socket
 import time
 import datetime
+from common import load_config
 
 logging.basicConfig(level=logging.INFO, filename="server.log", filemode="w")
 
-CONF_FILE = "serverconf.json"
 config = {}
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-configfile = open(CONF_FILE)
-
-
-def load_config():
-    global config
-    global configfile
-    configfile.seek(0)
-    logging.info(f"Loading configuration from {CONF_FILE}")
-    config = json.load(configfile)
-    logging.info(f"config loaded:\n{config}")
+active_connections = Queue()
 
 
 def bind_service():
     global sock
+    global active_connections
+    global config
+    active_connections = Queue()
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = config.get("host", "")  # defaults to localhost
     port = config.get("port", 8080)
@@ -41,15 +34,14 @@ def bind_service():
 def handle_interrupt(sig, frame):
     global config
     logging.info("Caught SIGINT, reloading server config.")
-    load_config()
+    config = load_config()
     if config.get("rebind_on_config_reload"):
         bind_service()
 
 
 signal.signal(signal.SIGINT, handle_interrupt)
-load_config()
+config = load_config()
 bind_service()
-active_connections = Queue()
 failures = 0
 
 # server loop
